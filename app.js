@@ -13,20 +13,21 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(session({
-  secret: 'AndrewKrevetka',
-  name: 'session',
-  resave: false,
-  rolling: true,
-  saveUninitialized: false,
-  cookie: {secure: false},
-  store: process.env.redisHost ?
-    new redisStore({
+if (process.env.redisHost) {
+  app.use(session({
+    secret: 'AndrewKrevetka',
+    name: 'session',
+    resave: false,
+    rolling: true,
+    saveUninitialized: false,
+    cookie: {secure: false},
+    store: new redisStore({
       host: process.env.redisHost || 'localhost',
       port: process.env.redisPort || 6379,
       logErrors: logger.error
-    }) : null
-}));
+    })
+  }));
+}
 
 app.use(logger('dev'));
 app.use(express.json());
